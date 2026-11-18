@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c1a17">
+<title>Ignition Timing Helper</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="top">
+  <h1>Ignition Timing Helper</h1>
+  <p class="tagline">Static &amp; dynamic timing for Evo Harleys, Dyna
+  2000i setup, and the bench tests that back them up. Every spec
+  comes from a published source — the tool never invents one.</p>
+</header>
+
+<main>
+  <!-- ============ TIMING ============ -->
+  <section class="view active" id="view-timing">
+    <h2>Time it</h2>
+    <p class="muted">Pick your ignition and the job, then walk the
+    steps. Check each one off as you go — the checklist resets when
+    you switch jobs.</p>
+
+    <form id="timing-form" onsubmit="return false">
+      <fieldset>
+        <legend>What are you timing?</legend>
+        <div class="grid2">
+          <label>Ignition
+            <select id="t-ignition">
+              <option value="stock">Stock module (factory sensor)</option>
+              <option value="dyna-2000i">Dyna 2000i</option>
+            </select>
+          </label>
+          <label>Method
+            <select id="t-method">
+              <option value="dynamic">Dynamic — timing light, engine running</option>
+              <option value="static">Static — engine off, find TDC</option>
+            </select>
+          </label>
+        </div>
+        <p class="muted" id="t-method-note"></p>
+      </fieldset>
+    </form>
+
+    <div id="timing-steps"></div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Log the result</h3>
+      <p class="muted">What you set, and what you saw. It lands in
+      the Log tab.</p>
+      <div class="grid2">
+        <label>Bike
+          <input type="text" id="t-bike" placeholder="e.g. 1990 Softail">
+        </label>
+        <label>Date
+          <input type="date" id="t-date">
+        </label>
+      </div>
+      <label>Result — what you set / what you saw
+        <input type="text" id="t-result" placeholder="e.g. 20° mark centered at 1200 rpm, VOES check passed">
+      </label>
+      <label>Notes (optional)
+        <input type="text" id="t-notes" placeholder="e.g. curve 2, 6500 rpm limit, single fire">
+      </label>
+      <button type="button" class="big" id="t-log-btn">Save to log</button>
+      <div id="t-log-msg" class="muted"></div>
+    </div>
+  </section>
+
+  <!-- ============ DYNA 2000i ============ -->
+  <section class="view" id="view-dyna">
+    <h2>Dyna 2000i setup</h2>
+    <p class="muted">Six mode switches, set once. Pick your curve,
+    rev limit, VOES mode, and firing mode — the tool shows the switch
+    positions and what they mean. Source: Dynatek Dyna 2000i-P
+    instructions, part 2801103 Rev. C.</p>
+
+    <form id="dyna-form" onsubmit="return false">
+      <fieldset>
+        <legend>Your build</legend>
+        <label>Build level — suggests a starting curve
+          <select id="d-build">
+            <option value="stock">Stock / near stock</option>
+            <option value="mild">Mild bolt-ons (pipes, air cleaner, mild cam)</option>
+            <option value="built">Built motor (high compression, hot cam)</option>
+            <option value="detonates">It pings on the current curve</option>
+            <option value="still-detonates">It still pings on curve 3</option>
+          </select>
+        </label>
+        <div id="d-suggest" class="note"></div>
+        <div class="grid2">
+          <label>Advance curve
+            <select id="d-curve">
+              <option value="1">Curve 1 — most aggressive</option>
+              <option value="2" selected>Curve 2 — near stock</option>
+              <option value="3">Curve 3 — built / detonation-prone</option>
+              <option value="4">Curve 4 — least aggressive</option>
+            </select>
+          </label>
+          <label>Rev limit
+            <select id="d-rev">
+              <option value="6000" selected>6000 rpm — stock motor</option>
+              <option value="6500">6500 rpm — modified street</option>
+              <option value="7000">7000 rpm — race motor</option>
+              <option value="7500">7500 rpm — race motor</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid2">
+          <label>V.O.E.S. mode
+            <select id="d-voes">
+              <option value="normal" selected>Normal — VOES connected</option>
+              <option value="retard">Retard — nitrous / turbo trigger</option>
+            </select>
+          </label>
+          <label>Firing mode
+            <select id="d-fire">
+              <option value="dual" selected>Dual fire — one coil, both cylinders</option>
+              <option value="single">Single fire — two coils, one per cylinder</option>
+            </select>
+          </label>
+        </div>
+        <label>Plugs per cylinder
+          <select id="d-plugs">
+            <option value="1" selected>Single plug</option>
+            <option value="2">Dual plug</option>
+          </select>
+        </label>
+      </fieldset>
+      <button type="button" class="big" id="d-run">Show the switch settings</button>
+    </form>
+    <div id="d-results"></div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Before you bolt it in</h3>
+      <ul>
+        <li><strong>Gold rotor only</strong> — HD part no. 32402-83.
+        The earlier silver cup will not work properly.</li>
+        <li><strong>Coil primary must be 2.5–3.5 ohms.</strong> A
+        coil outside that range can fault the module (rapid-flash
+        red LED).</li>
+        <li><strong>Suppression plug wires only</strong> — carbon,
+        graphite, or spiral core. No metal-core wires.</li>
+        <li><strong>Green wire is the tach output.</strong> Do not
+        connect it to the coil.</li>
+        <li><strong>Power cycle after changing switches</strong> —
+        new settings only take effect when power goes off and back
+        on.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ MARK MATH ============ -->
+  <section class="view" id="view-marks">
+    <h2>Flywheel mark math</h2>
+    <p class="muted">Timing marks are just geometry: so many degrees
+    around a wheel of a given diameter. Measure your own flywheel
+    diameter across the marks and the tool does the arithmetic —
+    no spec to look up, no number invented.</p>
+
+    <div class="card">
+      <h3 style="margin-top:0">Degrees → distance between marks</h3>
+      <div class="grid2">
+        <label>Flywheel diameter (in) — measure it
+          <input type="number" id="m-dia" min="1" max="30" step="0.01" inputmode="decimal" placeholder="e.g. 8.5">
+        </label>
+        <label>Degrees between marks
+          <input type="number" id="m-deg" min="0" max="360" step="0.5" inputmode="decimal" value="20">
+        </label>
+      </div>
+      <button type="button" class="big" id="m-run">How far apart?</button>
+      <div id="m-out"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Distance → degrees</h3>
+      <p class="muted">Measured the gap between two marks with a
+      tape? Work out what it means in degrees.</p>
+      <div class="grid2">
+        <label>Flywheel diameter (in)
+          <input type="number" id="m-dia2" min="1" max="30" step="0.01" inputmode="decimal" placeholder="same as above">
+        </label>
+        <label>Measured arc between marks (in)
+          <input type="number" id="m-arc" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 1.48">
+        </label>
+      </div>
+      <button type="button" class="big" id="m-run2">How many degrees?</button>
+      <div id="m-out2"></div>
+    </div>
+
+    <div class="note">Factory reference, for a stock Evo: the advance
+    mark sits <strong>20° BTDC</strong> from the TDC mark
+    (#99482-98). On this calculator, 20° on an 8.5&nbsp;in flywheel
+    is about 1.48&nbsp;in — but measure your own wheel; flywheel
+    diameters vary by year and model, and the tool does not assume
+    one.</div>
+  </section>
+
+  <!-- ============ TESTS ============ -->
+  <section class="view" id="view-tests">
+    <h2>Bench tests</h2>
+    <p class="muted">Measure it, type the number in, get a pass or
+    fail against the published spec. No guessing — the spec is shown
+    next to your reading.</p>
+
+    <div class="card">
+      <h3 style="margin-top:0">Coil resistance — factory spec</h3>
+      <p class="muted">Primary 2.5–3.1 Ω; secondary 10,000–12,500 Ω
+      (#99482-98). Measure with the coil disconnected, meter on the
+      right range. Leave a side blank if you did not measure it.</p>
+      <div class="grid2">
+        <label>Primary resistance (Ω)
+          <input type="number" id="c-prim" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 2.8">
+        </label>
+        <label>Secondary resistance (Ω)
+          <input type="number" id="c-sec" min="0" step="100" inputmode="decimal" placeholder="e.g. 11000">
+        </label>
+      </div>
+      <button type="button" class="big" id="c-run">Check the coil</button>
+      <div id="c-out"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">V.O.E.S. vacuum test — factory spec</h3>
+      <p class="muted">The switch must read open at rest, and close
+      (&lt;1 Ω) at 3.5–4.5 inHg vacuum (89–114 mm Hg) — vacuum pump
+      HD-23738 (#99482-98, Ch. 8).</p>
+      <div class="grid2">
+        <label>Vacuum applied (inHg)
+          <input type="number" id="v-vac" min="0" max="30" step="0.1" inputmode="decimal" placeholder="e.g. 4.0">
+        </label>
+        <label>Switch reading (Ω) — blank if not measured
+          <input type="number" id="v-ohms" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 0.5, or 999999 for open">
+        </label>
+      </div>
+      <button type="button" class="big" id="v-run">Check the V.O.E.S.</button>
+      <div id="v-out"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Dyna 2000i status LED</h3>
+      <p class="muted">What the red LED is telling you (Dynatek
+      2801103 Rev. C).</p>
+      <label>What the LED is doing
+        <select id="l-pattern">
+          <option value="power-on-blink">Blinks 1/4 second when power is turned on</option>
+          <option value="blinks-while-cranking">Blinks while the engine is cranked</option>
+          <option value="rapid-flash">Flashes rapidly with the engine not running</option>
+          <option value="on-at-tdc">Stays on at TDC while cranking</option>
+          <option value="off">Off — nothing at all</option>
+        </select>
+      </label>
+      <button type="button" class="big" id="l-run">What does it mean?</button>
+      <div id="l-out"></div>
+    </div>
+  </section>
+
+  <!-- ============ REFERENCE ============ -->
+  <section class="view" id="view-reference">
+    <h2>Reference — the numbers, with sources</h2>
+    <p class="muted">Everything below is a published number with its
+    source named. If a value is not here, this tool does not have it
+    — and it says so instead of guessing.</p>
+    <div id="reference"></div>
+  </section>
+
+  <!-- ============ LOG ============ -->
+  <section class="view" id="view-log">
+    <h2>Timing log</h2>
+    <p class="muted">Every timing job you have done, per bike. Lives
+    on this device only — export the JSON for a backup, or to move
+    it to another device.</p>
+    <div id="log-list"></div>
+    <div class="card">
+      <h3 style="margin-top:0">Backup / move</h3>
+      <button type="button" id="log-export">Download JSON</button>
+      <button type="button" class="secondary" id="log-copy">Copy JSON</button>
+      <label style="margin-top:12px">Import JSON (replaces the current log)
+        <input type="file" id="log-import-file" accept=".json,application/json">
+      </label>
+      <label>…or paste JSON here
+        <textarea id="log-import-text" rows="3" placeholder='{"version":1,"entries":[...]}'></textarea>
+      </label>
+      <button type="button" class="secondary" id="log-import-text-btn">Import pasted JSON</button>
+      <button type="button" class="danger" id="log-clear">Delete the whole log</button>
+      <div id="log-msg" class="muted"></div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="view" id="view-about">
+    <h2>How this tool works — and what it isn't</h2>
+    <div class="card">
+      <h3 style="margin-top:0">What it is</h3>
+      <p>A garage-side timing helper for carbureted Evo Harleys: the
+      factory static and dynamic procedures, the Dyna 2000i mode
+      switches, flywheel mark math, and the coil / V.O.E.S. bench
+      tests — with a log so the next time you time a bike you know
+      what you did last time.</p>
+      <h3>Where the numbers come from</h3>
+      <ul>
+        <li><strong>Factory procedures and specs</strong> —
+        Harley-Davidson 1997–1998 Softail Service Manual #99482-98,
+        Chapter 1 ("Ignition Timing and V.O.E.S.") and Chapter 8
+        ("Ignition Timing", "V.O.E.S."). Timing setting 20° BTDC at
+        1050–1500 rpm, check every 5000 miles.</li>
+        <li><strong>Dyna 2000i curves, switches, coils, and
+        LEDs</strong> — Dynatek Dyna 2000i-P instructions, part
+        2801103 Rev. C (the manufacturer's instruction sheet).</li>
+        <li><strong>One note from the earlier sheet</strong> — the
+        1995-and-later flywheel mark warning comes from the Dynatek
+        Dyna 2000 instructions, Rev. 2/99, and is labeled as such.</li>
+      </ul>
+      <h3>What it isn't</h3>
+      <ul>
+        <li>Not a service manual. If a step here disagrees with your
+        manual, your manual wins — this tool is a quick reference,
+        not a replacement.</li>
+        <li>Not a dyno or a tuning guide. Jetting lives in the
+        carb journal; this tool only times the spark.</li>
+        <li>It never invents a spec. Curves 5–8 on the 2000i are
+        programmable-only and the sheet gives no switch positions
+        for them, so the configurator refuses them instead of
+        guessing. Same for any model year or ignition this tool has
+        no published data for.</li>
+      </ul>
+      <h3>Privacy</h3>
+      <p>Everything runs on your device — plain JavaScript, no
+      server, no network, no account. The log lives in this
+      browser's local storage and moves only as a JSON file you
+      export yourself. Works offline from the first visit; add it
+      to your home screen and it lives there.</p>
+      <p class="muted">Version 1.0.0 — built for the weekly tool
+      build, November 2026.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="nav">
+  <button data-view="view-timing" class="active">Timing</button>
+  <button data-view="view-dyna">Dyna 2000i</button>
+  <button data-view="view-marks">Mark Math</button>
+  <button data-view="view-tests">Tests</button>
+  <button data-view="view-reference">Reference</button>
+  <button data-view="view-log">Log</button>
+  <button data-view="view-about">About</button>
+</nav>
+
+<noscript><div class="warn">This tool needs JavaScript — it runs
+entirely on your device, with no server and no network.</div></noscript>
+
+<script src="timing.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
