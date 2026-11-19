@@ -7,9 +7,10 @@ the Dyna 2000i configurator returns the right switches, mark math
 computes, the bench tests grade measurements, the reference renders
 with sources, and the log saves and exports — with no page errors
 and no failed requests. The only external requests are the Google
-Fonts stylesheets for the palette-1a type; they fall back gracefully
-offline (and in sandboxes with no route to the CDN, the test tolerates
-those two hosts failing).
+Fonts stylesheets for the 1990 Treatment type (Archivo Narrow,
+UnifrakturCook); they fall back gracefully offline (and in sandboxes
+with no route to the CDN, the test tolerates those two hosts
+failing).
 
 Requires: playwright + chromium (one-time setup, NOT shipped with the
 app — see TESTING.md):

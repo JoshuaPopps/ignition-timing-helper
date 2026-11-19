@@ -186,9 +186,14 @@ static-server check that every asset serves.
 
 ## Version history
 
-- **v1.1.0** (Nov 18, 2026) — restyled to the Evo visual system
-  (palette 1a): aged-cream shop paper, typewriter display type,
-  red-wire accent. Same specs, same behavior, new look.
+- **v1.2.0** (Nov 18, 2026) — restyled to the 1990 Treatment
+  (gloss tank black, chrome, purple, Old English headings) to match
+  the bike log, dyno, speedometer and Pocket Garage. Same specs,
+  same behavior, new look.
+- **v1.1.0** (Nov 18, 2026) — restyled to the cream palette-1a
+  paper look. **Wrong system** — built from a stale local copy of
+  the bike log's stylesheet; the suite had already moved to the
+  1990 Treatment. Superseded by v1.2.0 the same night.
 - **v1.0.0** (Nov 18, 2026) — first release.
 
 ## License

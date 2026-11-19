@@ -1,4 +1,4 @@
-# Test notes — ignition-timing-helper v1.1.0
+# Test notes — ignition-timing-helper v1.2.0
 
 Tested 2026-11-18. The app is plain JavaScript — `index.html` +
 `timing.js` (engine + sourced data) + `app.js` (UI) + `styles.css` +
@@ -93,37 +93,42 @@ serves the project dir on localhost and checks:
    cache serves the app shell and the procedure renders. No page
    errors, no failed requests anywhere in the run.
 
-## v1.1.0 restyle — Evo visual system (palette 1a), Nov 18, 2026
+## v1.2.0 restyle — 1990 Treatment, Nov 18, 2026
 
-The v1.0.0 ship wore the dyno's old dark-charcoal/amber look. v1.1.0
-restyles the app to the house system shared with the bike maintenance
-log and the Evo wiring planner: aged-cream shop paper with a
-blue-green graph grid, heavy black ink, Special Elite typewriter
-display type, Caveat eyebrow, Chivo body, IBM Plex Mono for data, and
-the red-wire orange accent. No rounded corporate cards, hard offset
-shadows, radius 0. Fonts load from Google Fonts with graceful
-offline fallback (system/Courier stacks) — same pattern as the bike
-log. Changed files: `styles.css` (full rewrite), `index.html` (font
-links, theme-color, eyebrow), `manifest.webmanifest` (theme colors),
-`sw.js` (cache v1 → v2), About version line. No behavior changed.
+v1.1.0 restyled the app to the cream palette-1a paper look — the
+wrong system. It was built from a stale local copy of the bike
+log's stylesheet; the suite had already moved to the 1990 Treatment
+(gloss tank black, chrome, purple glow, Old English headings) on
+November 12–13. v1.2.0 corrects it, porting the stylesheet from the
+LIVE dyno stylesheet (verified against the served file, not the
+local staging copy): `:root[data-theme="1990"]` variables, chrome
+gradient headings in UnifrakturCook, Archivo Narrow body, purple
+`#9d6bff` accent, pinstripe dividers, dotted table rules. The
+`<html>` tag now carries `data-theme="1990"` — without it none of
+the variables apply. Changed files: `styles.css` (full rewrite),
+`index.html` (font links, theme-color, `data-theme`, chrome h1),
+`manifest.webmanifest` (theme colors), `sw.js` (cache v2 → v3),
+About version line. No behavior changed.
+
+Lesson, recorded in AGENTS.md: when porting a house look, verify
+the CURRENT live stylesheet — local staging copies go stale when a
+restyle lands from another worktree.
 
 After the restyle: `node test.js` still 84/84; `python3 test_ui.py`
-passes in full. One test change: the UI test now tolerates the two
-Google Fonts hosts failing (they are unreachable in this sandbox and
-fall back by design) while still failing on any other failed request
-— see the `font_hosts` filter in `test_ui.py`. The test docstring
-was corrected too ("no external requests" is no longer true).
+passes in full. The UI test's font-CDN tolerance (two Google Fonts
+hosts) is unchanged — only the families differ now (Archivo Narrow
++ UnifrakturCook).
 
 ## Visual check
 
 Screenshots of the Timing and Dyna 2000i tabs in headless Chromium
-(390×844, phone width) were eyeballed after the v1.1.0 restyle:
-aged-cream paper with graph grid and coffee-ring patina, typewriter
-headings, red-wire eyebrow and accents, hard-shadow cards and
-fieldsets, mono inputs and bottom nav with all seven tabs. No layout
-overflow at 390 px width. (Screenshots render with fallback type in
-this sandbox — the CDN fonts are unreachable here; on a phone they
-load as Special Elite / Caveat / Chivo / IBM Plex Mono.)
+(390×844, phone width) were eyeballed after the v1.2.0 restyle:
+gloss tank black with a faint graph grid, chrome Old English
+headings, purple eyebrow and accents, pinstripe dividers, dark
+panels with hard shadows, chrome buttons. No layout overflow at
+390 px width. (Screenshots render with fallback type in this
+sandbox — the CDN fonts are unreachable here; on a phone they load
+as Archivo Narrow / UnifrakturCook.)
 
 ## Static-server check
 
