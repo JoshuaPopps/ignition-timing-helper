@@ -1,7 +1,7 @@
 /* Ignition Timing Helper service worker — caches the app shell so the
  * helper works offline in the garage. Plain JavaScript, no runtime
  * download, no network at all. Version the cache name on release. */
-var CACHE = 'ignition-timing-helper-v1';
+var CACHE = 'ignition-timing-helper-v2';
 var ASSETS = [
   './', './index.html', './timing.js', './app.js', './styles.css',
   './manifest.webmanifest',

@@ -6,7 +6,10 @@ plain-JavaScript app actually runs: procedures render with steps,
 the Dyna 2000i configurator returns the right switches, mark math
 computes, the bench tests grade measurements, the reference renders
 with sources, and the log saves and exports — with no page errors
-and no failed requests. The app makes no external requests at all.
+and no failed requests. The only external requests are the Google
+Fonts stylesheets for the palette-1a type; they fall back gracefully
+offline (and in sandboxes with no route to the CDN, the test tolerates
+those two hosts failing).
 
 Requires: playwright + chromium (one-time setup, NOT shipped with the
 app — see TESTING.md):
@@ -42,16 +45,41 @@ def main():
     url = "http://127.0.0.1:%d/" % port
     errors = []
     failed_requests = []
+    font_failures = []
+    # Fonts are progressive enhancement from the Google Fonts CDN: the
+    # palette-1a type (Special Elite, Chivo, IBM Plex Mono, Caveat)
+    # falls back to system/Courier stacks offline, and this sandbox
+    # has no route to the CDN at all. A failed font fetch is therefore
+    # expected here, not an app error — but it must be a *font* fetch:
+    # every other failed request still fails the test.
+    font_hosts = ("fonts.googleapis.com", "fonts.gstatic.com")
+
+    def is_font(url):
+        return any(h in url for h in font_hosts)
+
+    def on_request_failed(r):
+        (font_failures if is_font(r.url) else failed_requests).append(r.url)
+
+    def on_response(r):
+        if r.status >= 400:
+            (font_failures if is_font(r.url) else failed_requests).append(r.url)
+
+    def on_console(m):
+        if m.type == "error":
+            # "Failed to load resource" for a font is covered by the
+            # requestfailed accounting above; anything else is real.
+            if m.text.startswith("Failed to load resource"):
+                return
+            errors.append(m.text)
+
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page(viewport={"width": 800, "height": 900})
             page.on("pageerror", lambda e: errors.append(str(e)))
-            page.on("console", lambda m: errors.append(m.text)
-                    if m.type == "error" else None)
-            page.on("requestfailed", lambda r: failed_requests.append(r.url))
-            page.on("response", lambda r: failed_requests.append(r.url)
-                    if r.status >= 400 else None)
+            page.on("console", on_console)
+            page.on("requestfailed", on_request_failed)
+            page.on("response", on_response)
             page.goto(url, wait_until="load")
 
             # 1. Timing tab: stock dynamic procedure renders with steps.
@@ -183,7 +211,9 @@ def main():
     assert not failed_requests, "failed requests: %r" % failed_requests
     print("UI test passed: procedures, Dyna configurator, mark math, "
           "bench tests, reference, log, about, offline — no page errors, "
-          "no failed requests.")
+          "no failed requests."
+          + (" (font CDN unreachable here, fallback type in use: %r)"
+             % font_failures if font_failures else ""))
 
 
 if __name__ == "__main__":

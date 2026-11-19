@@ -1,4 +1,4 @@
-# Test notes — ignition-timing-helper v1.0.0
+# Test notes — ignition-timing-helper v1.1.0
 
 Tested 2026-11-18. The app is plain JavaScript — `index.html` +
 `timing.js` (engine + sourced data) + `app.js` (UI) + `styles.css` +
@@ -93,12 +93,37 @@ serves the project dir on localhost and checks:
    cache serves the app shell and the procedure renders. No page
    errors, no failed requests anywhere in the run.
 
+## v1.1.0 restyle — Evo visual system (palette 1a), Nov 18, 2026
+
+The v1.0.0 ship wore the dyno's old dark-charcoal/amber look. v1.1.0
+restyles the app to the house system shared with the bike maintenance
+log and the Evo wiring planner: aged-cream shop paper with a
+blue-green graph grid, heavy black ink, Special Elite typewriter
+display type, Caveat eyebrow, Chivo body, IBM Plex Mono for data, and
+the red-wire orange accent. No rounded corporate cards, hard offset
+shadows, radius 0. Fonts load from Google Fonts with graceful
+offline fallback (system/Courier stacks) — same pattern as the bike
+log. Changed files: `styles.css` (full rewrite), `index.html` (font
+links, theme-color, eyebrow), `manifest.webmanifest` (theme colors),
+`sw.js` (cache v1 → v2), About version line. No behavior changed.
+
+After the restyle: `node test.js` still 84/84; `python3 test_ui.py`
+passes in full. One test change: the UI test now tolerates the two
+Google Fonts hosts failing (they are unreachable in this sandbox and
+fall back by design) while still failing on any other failed request
+— see the `font_hosts` filter in `test_ui.py`. The test docstring
+was corrected too ("no external requests" is no longer true).
+
 ## Visual check
 
 Screenshots of the Timing and Dyna 2000i tabs in headless Chromium
-(800×1000) were eyeballed: shop-manual paper cards on dark
-charcoal, amber accents, readable type, big touch targets, bottom
-nav with all seven tabs. No layout overflow at 800 px width.
+(390×844, phone width) were eyeballed after the v1.1.0 restyle:
+aged-cream paper with graph grid and coffee-ring patina, typewriter
+headings, red-wire eyebrow and accents, hard-shadow cards and
+fieldsets, mono inputs and bottom nav with all seven tabs. No layout
+overflow at 390 px width. (Screenshots render with fallback type in
+this sandbox — the CDN fonts are unreachable here; on a phone they
+load as Special Elite / Caveat / Chivo / IBM Plex Mono.)
 
 ## Static-server check
 

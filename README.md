@@ -184,6 +184,13 @@ static-server check that every asset serves.
 - The log lives in one browser on one device. Export the JSON to
   back it up or move it.
 
+## Version history
+
+- **v1.1.0** (Nov 18, 2026) — restyled to the Evo visual system
+  (palette 1a): aged-cream shop paper, typewriter display type,
+  red-wire accent. Same specs, same behavior, new look.
+- **v1.0.0** (Nov 18, 2026) — first release.
+
 ## License
 
 MIT. Do whatever you want with it — it's a garage tool.
