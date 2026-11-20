@@ -1,11 +1,11 @@
 /* Ignition Timing Helper service worker — caches the app shell so the
  * helper works offline in the garage. Plain JavaScript, no runtime
  * download, no network at all. Version the cache name on release. */
-var CACHE = 'ignition-timing-helper-v3';
+var CACHE = 'ignition-timing-helper-v4';
 var ASSETS = [
   './', './index.html', './timing.js', './app.js', './styles.css',
   './manifest.webmanifest',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/icon.svg'
+  './icons/icon-192.png', './icons/icon-512.png'
 ];
 
 self.addEventListener('install', function (event) {
